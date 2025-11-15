@@ -40,15 +40,15 @@ export default function LoginPage() {
         }
       );
 
-      login(profileResponse.data, token);
+      login({ userData: profileResponse.data, token });
       navigate("/dashboard");
 
       toast.success("Login successful!");
     } catch (error) {
       localStorage.clear();
-      toast.error(
-        error.response?.data?.message || "Login failed. Please try again."
-      );
+      console.error("Login error:", error);
+      const errorMessage = error.response?.data?.message || error.message || "Login failed. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
