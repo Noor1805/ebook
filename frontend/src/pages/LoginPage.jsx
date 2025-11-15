@@ -8,6 +8,7 @@ import Button from "../components/ui/Button";
 import { useAuth } from "../context/AuthContext";
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPaths";
+import { handleApiError } from "../utils/errorHandler";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -46,8 +47,7 @@ export default function LoginPage() {
       toast.success("Login successful!");
     } catch (error) {
       localStorage.clear();
-      console.error("Login error:", error);
-      const errorMessage = error.response?.data?.message || error.message || "Login failed. Please try again.";
+      const errorMessage = handleApiError(error);
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);

@@ -4,6 +4,7 @@ const MarkdownIt = require("markdown-it");
 const Book = require("../models/Book");
 const fs = require("fs");
 const path = require("path");
+const { getErrorMessage, errorResponse } = require("../utils/errorHandler");
 
 const md = new MarkdownIt();
 
@@ -15,10 +16,16 @@ const exportAsDocument = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
 
-    if (!book) return res.status(404).json({ message: "Book not found" });
+    if (!book) {
+      return errorResponse(res, 404, "Book not found. Unable to export.");
+    }
 
     if (book.userId.toString() !== req.user._id.toString()) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return errorResponse(
+        res,
+        403,
+        "You don't have permission to export this book."
+      );
     }
 
     const sections = [];
@@ -74,7 +81,12 @@ const exportAsDocument = async (req, res) => {
     res.send(buffer);
   } catch (error) {
     console.error("DOCX EXPORT ERROR:", error);
-    res.status(500).json({ message: "Export failed", error: error.message });
+    return errorResponse(
+      res,
+      500,
+      getErrorMessage(error, "Unable to export book as Word document. Please try again."),
+      error
+    );
   }
 };
 
@@ -86,10 +98,16 @@ const exportAsPDF = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
 
-    if (!book) return res.status(404).json({ message: "Book not found" });
+    if (!book) {
+      return errorResponse(res, 404, "Book not found. Unable to export.");
+    }
 
     if (book.userId.toString() !== req.user._id.toString()) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return errorResponse(
+        res,
+        403,
+        "You don't have permission to export this book."
+      );
     }
 
     const doc = new PDFDocument({ margin: 50 });
@@ -116,7 +134,12 @@ const exportAsPDF = async (req, res) => {
     doc.end();
   } catch (error) {
     console.error("PDF EXPORT ERROR:", error);
-    res.status(500).json({ message: "PDF export failed", error: error.message });
+    return errorResponse(
+      res,
+      500,
+      getErrorMessage(error, "Unable to export book as PDF. Please try again."),
+      error
+    );
   }
 };
 
