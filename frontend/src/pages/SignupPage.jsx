@@ -7,6 +7,7 @@ import InputField from "../components/ui/InputField";
 import Button from "../components/ui/Button";
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPaths";
+import { handleApiError } from "../utils/errorHandler";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -30,9 +31,8 @@ export default function SignupPage() {
       toast.success("Signup successful!");
       navigate("/login");
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Signup failed. Please try again."
-      );
+      const errorMessage = handleApiError(error);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

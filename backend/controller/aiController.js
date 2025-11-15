@@ -1,5 +1,6 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { model } = require("mongoose");
+const { getErrorMessage, errorResponse } = require("../utils/errorHandler");
 
 const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -7,8 +8,12 @@ const generateOutline = async (req, res) => {
   try {
     const { topic, style, numChapters, description } = req.body;
 
-    if (!topic) {
-      return res.status(400).json({ message: "Please provide a topic" });
+    if (!topic || topic.trim().length === 0) {
+      return errorResponse(
+        res,
+        400,
+        "Please provide a book topic to generate an outline"
+      );
     }
 
     const prompt = `
@@ -57,10 +62,11 @@ Generate the outline now.
     const endIndex = text.lastIndexOf("]") + 1;
 
     if (startIndex === -1 || endIndex === -1) {
-      return res.status(500).json({
-        message: "Failed to parse AI response (JSON not found)",
-        raw: text,
-      });
+      return errorResponse(
+        res,
+        500,
+        "Unable to generate book outline. The AI response format was unexpected. Please try again."
+      );
     }
 
     const jsonString = text.substring(startIndex, endIndex);
@@ -69,9 +75,19 @@ Generate the outline now.
     res.status(200).json({ outline });
   } catch (error) {
     console.error("Error generating outline:", error);
-    res
-      .status(500)
-      .json({ message: "Server error during AI outline generation" });
+    if (error.message && error.message.includes("API_KEY")) {
+      return errorResponse(
+        res,
+        500,
+        "AI service configuration error. Please contact support."
+      );
+    }
+    return errorResponse(
+      res,
+      500,
+      getErrorMessage(error, "Unable to generate book outline. Please try again later."),
+      error
+    );
   }
 };
 
@@ -80,10 +96,12 @@ const generateChapterContent = async (req, res) => {
   try {
     const { chapterTitle, chapterDiscription, style } = req.body;
 
-    if (!chapterTitle) {
-      return res
-        .status(400)
-        .json({ message: "please provide a chapter title" });
+    if (!chapterTitle || chapterTitle.trim().length === 0) {
+      return errorResponse(
+        res,
+        400,
+        "Please provide a chapter title to generate content"
+      );
     }
 
     const prompt = `
@@ -120,10 +138,20 @@ Begin writing the chapter content now:
     });
     res.status(200).json({ content: response.text });
   } catch (error) {
-    console.error("Error generating chapter ", error);
-    res
-      .status(500)
-      .json({ message: "Server error during AI chapter generation" });
+    console.error("Error generating chapter:", error);
+    if (error.message && error.message.includes("API_KEY")) {
+      return errorResponse(
+        res,
+        500,
+        "AI service configuration error. Please contact support."
+      );
+    }
+    return errorResponse(
+      res,
+      500,
+      getErrorMessage(error, "Unable to generate chapter content. Please try again later."),
+      error
+    );
   }
 };
 

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BASE_URL } from "./apiPaths";
+import { getErrorMessage } from "./errorHandler";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -22,19 +23,26 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-  (response) => {return response},
+  (response) => {
+    return response;
+  },
   (error) => {
-    if (error.response) {
-      if (error.response.status === 500) {
-        console.error("Server error. Please try again later.");
-      } else if (error.code === "ECONNABORTED") {
-        console.error("Request timeout. Please try again.");
-      } else {
-        console.error(`Error: ${error.response.statusText}`);
-      }
-    } else {
-      console.error("Network error or no response from server.");
+    const errorMessage = getErrorMessage(error);
+    
+    // Only show toast for certain errors (401 will be handled by individual pages)
+    // Don't show toast for 401 as pages handle login redirects
+    if (error.response?.status === 401) {
+      // Let individual pages handle 401 errors (they might want to redirect)
+      return Promise.reject(error);
     }
+
+    // Log error for debugging
+    console.error("API Error:", {
+      message: errorMessage,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+
     return Promise.reject(error);
   }
 );

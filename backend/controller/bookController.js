@@ -1,4 +1,5 @@
 const Book = require("../models/Book");
+const { getErrorMessage, errorResponse } = require("../utils/errorHandler");
 
 /** ✅ Create Book */
 const createBook = async (req, res) => {
@@ -6,22 +7,42 @@ const createBook = async (req, res) => {
     const { title, subtitle, author, chapters } = req.body;
 
     if (!title || !author) {
-      return res
-        .status(400)
-        .json({ message: "Please provide title and author" });
+      return errorResponse(
+        res,
+        400,
+        "Please provide both title and author to create a book"
+      );
+    }
+
+    if (title.trim().length === 0) {
+      return errorResponse(res, 400, "Book title cannot be empty");
+    }
+
+    if (author.trim().length === 0) {
+      return errorResponse(res, 400, "Author name cannot be empty");
     }
 
     const book = await Book.create({
-      userId: req.user._id, // ✅ userId not UserId
+      userId: req.user._id,
       title,
       subtitle,
       author,
       chapters,
     });
 
-    res.status(201).json(book);
+    res.status(201).json({
+      success: true,
+      message: "Book created successfully",
+      ...book.toObject(),
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    console.error("Create book error:", error);
+    return errorResponse(
+      res,
+      500,
+      getErrorMessage(error, "Unable to create book. Please try again."),
+      error
+    );
   }
 };
 
@@ -32,9 +53,19 @@ const getBooks = async (req, res) => {
       createdAt: -1,
     });
 
-    res.status(200).json(books);
+    res.status(200).json({
+      success: true,
+      count: books.length,
+      books,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    console.error("Get books error:", error);
+    return errorResponse(
+      res,
+      500,
+      getErrorMessage(error, "Unable to fetch your books. Please try again."),
+      error
+    );
   }
 };
 
@@ -43,17 +74,33 @@ const getBookById = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
 
-    if (!book) return res.status(404).json({ message: "Book Not Found" });
-
-    if (book.userId.toString() !== req.user._id.toString()) {
-      return res
-        .status(401)
-        .json({ message: "Not authorized to view this book" });
+    if (!book) {
+      return errorResponse(res, 404, "Book not found. It may have been deleted or doesn't exist.");
     }
 
-    res.status(200).json(book);
+    if (book.userId.toString() !== req.user._id.toString()) {
+      return errorResponse(
+        res,
+        403,
+        "You don't have permission to access this book."
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      book,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    console.error("Get book by ID error:", error);
+    if (error.name === "CastError") {
+      return errorResponse(res, 400, "Invalid book ID format.");
+    }
+    return errorResponse(
+      res,
+      500,
+      getErrorMessage(error, "Unable to fetch book. Please try again."),
+      error
+    );
   }
 };
 
@@ -62,19 +109,39 @@ const updateBook = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
 
-    if (!book) return res.status(404).json({ message: "Book Not Found" });
+    if (!book) {
+      return errorResponse(res, 404, "Book not found. It may have been deleted.");
+    }
 
     if (book.userId.toString() !== req.user._id.toString()) {
-      return res.status(401).json({ message: "Not authorized" });
+      return errorResponse(
+        res,
+        403,
+        "You don't have permission to update this book."
+      );
     }
 
     const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
+      runValidators: true,
     });
 
-    res.status(200).json(updatedBook);
+    res.status(200).json({
+      success: true,
+      message: "Book updated successfully",
+      book: updatedBook,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    console.error("Update book error:", error);
+    if (error.name === "CastError") {
+      return errorResponse(res, 400, "Invalid book ID format.");
+    }
+    return errorResponse(
+      res,
+      500,
+      getErrorMessage(error, "Unable to update book. Please try again."),
+      error
+    );
   }
 };
 
@@ -83,17 +150,35 @@ const deleteBook = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
 
-    if (!book) return res.status(404).json({ message: "Book Not Found" });
+    if (!book) {
+      return errorResponse(res, 404, "Book not found. It may have already been deleted.");
+    }
 
     if (book.userId.toString() !== req.user._id.toString()) {
-      return res.status(401).json({ message: "Not authorized" });
+      return errorResponse(
+        res,
+        403,
+        "You don't have permission to delete this book."
+      );
     }
 
     await book.deleteOne();
 
-    res.status(200).json({ message: "Book deleted successfully" });
+    res.status(200).json({
+      success: true,
+      message: "Book deleted successfully",
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    console.error("Delete book error:", error);
+    if (error.name === "CastError") {
+      return errorResponse(res, 400, "Invalid book ID format.");
+    }
+    return errorResponse(
+      res,
+      500,
+      getErrorMessage(error, "Unable to delete book. Please try again."),
+      error
+    );
   }
 };
 
@@ -102,23 +187,42 @@ const updateBookCover = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
 
-    if (!book) return res.status(404).json({ message: "Book Not Found" });
+    if (!book) {
+      return errorResponse(res, 404, "Book not found.");
+    }
 
     if (book.userId.toString() !== req.user._id.toString()) {
-      return res.status(401).json({ message: "Not authorized" });
+      return errorResponse(
+        res,
+        403,
+        "You don't have permission to update this book's cover."
+      );
     }
 
     if (!req.file) {
-      book.coverImage = `/${req.file.path}`;
-    } else {
-      return res.status(400).json({ message: "No image uploaded" });
+      return errorResponse(
+        res,
+        400,
+        "No image file uploaded. Please select an image file."
+      );
     }
     
-    const updateBook = await book.save();
+    book.coverImage = `/${req.file.path}`;
+    const updatedBook = await book.save();
 
-    res.status(200).json(updateBook);
+    res.status(200).json({
+      success: true,
+      message: "Book cover updated successfully",
+      book: updatedBook,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    console.error("Update book cover error:", error);
+    return errorResponse(
+      res,
+      500,
+      getErrorMessage(error, "Unable to update book cover. Please try again."),
+      error
+    );
   }
 };
 
