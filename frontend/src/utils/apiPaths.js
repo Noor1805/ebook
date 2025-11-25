@@ -9,12 +9,13 @@ export const API_PATHS = {
   },
 
   BOOKS: {
-    CREATE_BOOK: "/api/books",
-    GET_BOOKS: "/api/books",
-    GET_BOOK_BY_ID: "/api/books",
-    UPDATE_BOOK: "/api/books",
-    DELETE_BOOK: "/api/books",
-    UPDATE_COVER: "/api/books/cover",
+    // Backend mounts book routes at /api/book (singular)
+    CREATE_BOOK: "/api/book",
+    GET_BOOKS: "/api/book",
+    GET_BOOK_BY_ID: "/api/book",      // use with /:id
+    UPDATE_BOOK: "/api/book",         // use with /:id
+    DELETE_BOOK: "/api/book",         // use with /:id
+    UPDATE_COVER: "/api/book/cover",  // use with /:id
   },
 
   AI: {
