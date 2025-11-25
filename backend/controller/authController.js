@@ -47,8 +47,6 @@ exports.registerUser = async (req, res) => {
       );
     }
 
-    // Note: password will be hashed by the User model's pre("save") hook.
-    // Do NOT hash it here, otherwise it will be double-hashed and login will always fail.
     const user = await User.create({
       name,
       email,
@@ -57,10 +55,16 @@ exports.registerUser = async (req, res) => {
 
     if (user) {
       res.status(201).json({
-        success: true,
-        message: "Account created successfully! You can now log in.",
-        token: generateToken(user._id),
-      });
+  success: true,
+  message: "Account created successfully! You can now log in.",
+  userData: {
+    _id: user._id,
+    name: user.name,
+    email: user.email
+  },
+  token: generateToken(user._id),
+});
+
     } else {
       return errorResponse(
         res,
@@ -81,6 +85,7 @@ exports.registerUser = async (req, res) => {
     );
   }
 };
+
 
 //  Login User
 //  Login User (FIXED)
@@ -112,14 +117,19 @@ exports.loginUser = async (req, res) => {
       );
     }
 
-    return res.json({
-      success: true,
-      message: "Login successful! Welcome back.",
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user._id),
-    });
+   return res.json({
+  success: true,
+  message: "Login successful! Welcome back.",
+  userData: {
+    _id: user._id,        // ⭐ FIX: id → _id
+    name: user.name,
+    email: user.email,
+  },
+  token: generateToken(user._id),
+});
+
+
+
   } catch (error) {
     console.error("LOGIN ERROR:", error);
     return errorResponse(

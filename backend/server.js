@@ -33,7 +33,7 @@ app.use("/backend/uploads", express.static(path.join(__dirname, "uploads")));
 // ✅ All backend API routes
 app.use("/api/auth", authRoute); // login/signup
 app.use("/api/ai", aiRoute); // user related
-app.use("/api/book", bookRoute);
+app.use("/api/books", bookRoute);
 app.use("/api/export", exportRoute); 
 
 // ✅ Start server
