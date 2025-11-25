@@ -49,7 +49,7 @@ const createBook = async (req, res) => {
 /** ✅ Get All Books of Logged-in User */
 const getBooks = async (req, res) => {
   try {
-    const books = await Book.find({ userId: req.user._id }).sort({
+    const books = await Book.find({ UserId: req.user._id }).sort({
       createdAt: -1,
     });
 
@@ -78,7 +78,7 @@ const getBookById = async (req, res) => {
       return errorResponse(res, 404, "Book not found. It may have been deleted or doesn't exist.");
     }
 
-    if (book.userId.toString() !== req.user._id.toString()) {
+    if (book.UserId.toString() !== req.user._id.toString()) {
       return errorResponse(
         res,
         403,
@@ -113,7 +113,7 @@ const updateBook = async (req, res) => {
       return errorResponse(res, 404, "Book not found. It may have been deleted.");
     }
 
-    if (book.userId.toString() !== req.user._id.toString()) {
+    if (book.UserId.toString() !== req.user._id.toString()) {
       return errorResponse(
         res,
         403,
@@ -154,7 +154,7 @@ const deleteBook = async (req, res) => {
       return errorResponse(res, 404, "Book not found. It may have already been deleted.");
     }
 
-    if (book.userId.toString() !== req.user._id.toString()) {
+    if (book.UserId.toString() !== req.user._id.toString()) {
       return errorResponse(
         res,
         403,
@@ -191,7 +191,7 @@ const updateBookCover = async (req, res) => {
       return errorResponse(res, 404, "Book not found.");
     }
 
-    if (book.userId.toString() !== req.user._id.toString()) {
+    if (book.UserId.toString() !== req.user._id.toString()) {
       return errorResponse(
         res,
         403,

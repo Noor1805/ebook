@@ -43,30 +43,27 @@ const CreateBookModal = ({ isOpen, onClose, onBookCreated }) => {
   };
 
   const handleGenerateOutline = async () => {
-    if (!bookTitle  || !numChapters) {
+    if (!bookTitle || !numChapters) {
       toast.error("Please fill in all required fields.");
       return;
     }
     setIsGeneratingOutline(true);
 
     try {
-      
+      const response = await axiosInstance.post(API_PATHS.AI.GENERATE_OUTLINE, {
+        topic: bookTitle, // title → topic
+        description: aiTopic, // same
+        style: aiStyle,
+        numChapters: numChapters,
+      });
 
-      const response = await axiosInstance.post(
-  API_PATHS.AI.GENERATE_OUTLINE,
-  {
-    topic: bookTitle,            // title → topic
-    description: aiTopic,        // same
-    style: aiStyle,
-    numChapters: numChapters,
-  }
-);
-
-        setChapters(response.data.outline);
+      setChapters(response.data.outline);
       setStep(2);
       toast.success("Outline generated successfully!");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to generate outline.");
+      toast.error(
+        error.response?.data?.message || "Failed to generate outline."
+      );
     } finally {
       setIsGeneratingOutline(false);
     }
@@ -76,14 +73,13 @@ const CreateBookModal = ({ isOpen, onClose, onBookCreated }) => {
     const updatedChapters = [...chapters];
     updatedChapters[index][field] = value;
     setChapters(updatedChapters);
-  }
+  };
 
   const handleDeleteChapter = (index) => {
-  const updated = [...chapters];
-  updated.splice(index, 1);
-  setChapters(updated);
-};
-
+    const updated = [...chapters];
+    updated.splice(index, 1);
+    setChapters(updated);
+  };
 
   const handleAddChapter = () => {
     setChapters([
@@ -97,25 +93,22 @@ const CreateBookModal = ({ isOpen, onClose, onBookCreated }) => {
       toast.error("Please complete all steps before finalizing.");
       return;
     }
-    
-      setIsFinalizingBook(true);
+
+    setIsFinalizingBook(true);
 
     try {
-
       const response = await axiosInstance.post(API_PATHS.BOOKS.CREATE_BOOK, {
-  title: bookTitle,
-  author: user.name || "Unknown Author",
-  UserId: user._id,      // ⭐ REQUIRED FIX
-  chapters: chapters,
-});
-
+        title: bookTitle,
+        author: user.name || "Unknown Author",
+        UserId: user._id, // ⭐ REQUIRED FIX
+        chapters: chapters,
+      });
 
       toast.success("eBook created successfully!");
       onBookCreated(response.data._id);
       resetModal();
       onClose();
     } catch (error) {
-      console.log("TESR_", bookTitle, chapters);
       toast.error(error.response?.data?.message || "Failed to finalize book.");
     } finally {
       setIsFinalizingBook(false);
@@ -211,6 +204,7 @@ const CreateBookModal = ({ isOpen, onClose, onBookCreated }) => {
 
       {step === 2 && (
         <div className="space-y-5">
+          {/* Step Progress */}
           <div className="flex items-center gap-2 mb-6">
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-violet-100 text-violet-600 text-sm font-semibold">
               1
@@ -221,18 +215,20 @@ const CreateBookModal = ({ isOpen, onClose, onBookCreated }) => {
             </div>
           </div>
 
+          {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">
               Review Chapters
             </h3>
-            <span className="text-sm  text-gray-500">
+            <span className="text-sm text-gray-500">
               {chapters.length} chapters
             </span>
           </div>
 
+          {/* Chapters List */}
           <div
             ref={chaptersContainerRef}
-            className="space-y-3 max-h-96 overflow-y-auto  pr-1"
+            className="space-y-4 max-h-96 overflow-y-auto pr-1"
           >
             {chapters.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-10 px-4 bg-gray-50 rounded-xl border border-gray-200 text-center">
@@ -245,61 +241,58 @@ const CreateBookModal = ({ isOpen, onClose, onBookCreated }) => {
               chapters.map((chapter, index) => (
                 <div
                   key={index}
-                  className="group p-4 border border-gray-200 rounded-xl hover:border-gray-400 hover:shadow-sm -all bg-white"
+                  className="p-5 border border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-md transition"
                 >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div>
-                      <div>{index + 1}</div>
+                  {/* Chapter Number */}
+                  <div className="text-center text-xs text-gray-400 mb-2">
+                    Chapter {index + 1}
+                  </div>
 
-                      {/* Title Input */}
-                      <input
-                        type="text"
-                        value={chapter.title}
-                        onChange={(e) =>
-                          handleChapterChange(index, "title", e.target.value)
-                        }
-                        placeholder="Chapter Title"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm 
-                        focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition"
-                      />
+                  {/* Title Centered */}
+                  <input
+                    type="text"
+                    value={chapter.title}
+                    onChange={(e) =>
+                      handleChapterChange(index, "title", e.target.value)
+                    }
+                    className="w-full text-center text-xl font-semibold text-gray-900 border-none outline-none bg-transparent"
+                    placeholder="Chapter Title"
+                  />
 
-                      {/* Delete Button */}
-                      <button
-                        onClick={() => handleDeleteChapter(index)}
-                        className="p-2 mt-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                        title="Delete Chapter"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                  {/* Description */}
+                  <textarea
+                    value={chapter.description}
+                    onChange={(e) =>
+                      handleChapterChange(index, "description", e.target.value)
+                    }
+                    placeholder="Write the chapter story here..."
+                    className="w-full mt-4 border border-gray-300 rounded-lg px-3 py-2 text-sm 
+              focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition resize-none"
+                    rows={5}
+                  />
 
-                    {/* Description */}
-                    <textarea
-                      value={chapter.description}
-                      onChange={(e) =>
-                        handleChapterChange(
-                          index,
-                          "description",
-                          e.target.value
-                        )
-                      }
-                      placeholder="Chapter Description"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm 
-                      focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition resize-none"
-                      rows={2}
-                    />
+                  {/* Delete Button */}
+                  <div className="flex justify-end mt-3">
+                    <button
+                      onClick={() => handleDeleteChapter(index)}
+                      className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                      title="Delete Chapter"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                   </div>
                 </div>
               ))
             )}
           </div>
 
+          {/* Footer Buttons */}
           <div className="flex items-center gap-3 justify-between pt-4">
             <Button variant="ghost" onClick={() => setStep(1)} icon={ArrowLeft}>
               Back
             </Button>
 
-            <div className=" flex gap-2">
+            <div className="flex gap-2">
               <Button
                 variant="secondary"
                 onClick={handleAddChapter}
