@@ -20,7 +20,7 @@ const exportAsDocument = async (req, res) => {
       return errorResponse(res, 404, "Book not found. Unable to export.");
     }
 
-    if (book.userId.toString() !== req.user._id.toString()) {
+    if (book.UserId.toString() !== req.user._id.toString()) {
       return errorResponse(
         res,
         403,
@@ -102,7 +102,7 @@ const exportAsPDF = async (req, res) => {
       return errorResponse(res, 404, "Book not found. Unable to export.");
     }
 
-    if (book.userId.toString() !== req.user._id.toString()) {
+    if (book.UserId.toString() !== req.user._id.toString()) {
       return errorResponse(
         res,
         403,

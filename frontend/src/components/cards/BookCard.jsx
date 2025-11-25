@@ -6,8 +6,9 @@ const BookCard = ({ book, onDelete }) => {
   const navigate = useNavigate();
 
   const coverImageUrl = book.coverImage
-    ? `${BASE_URL}/backends${book.coverImage}`.replace(/\\/g, "/")
-    : "";
+  ? `${BASE_URL}${book.coverImage}`.replace(/\\/g, "/")
+  : null;
+
 
   return (
   <div
@@ -15,12 +16,21 @@ const BookCard = ({ book, onDelete }) => {
     onClick={() => navigate(`/view-book/${book._id}`)}
   >
     <div className="realative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100">
-      <img
-        src={coverImageUrl}
-        alt={book.title}
-        className="w-full aspect-h-16 aspect-w-25 object-cover group-hover:scale-105 transition-transform duration-500  "
-        onError={(e) => { e.target.src = ""; }}
-      />
+      {coverImageUrl ? (
+  <img
+    src={coverImageUrl}
+    alt={book.title}
+    className="w-full aspect-h-16 aspect-w-25 object-cover group-hover:scale-105 transition-transform duration-500"
+    onError={(e) => {
+      e.target.src = "https://via.placeholder.com/600x800?text=No+Cover";
+    }}
+  />
+) : (
+  <div className="w-full aspect-h-16 aspect-w-25 bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
+    No Cover Image
+  </div>
+)}
+
     
 
     <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2">
