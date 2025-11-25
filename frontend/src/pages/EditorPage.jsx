@@ -16,8 +16,6 @@ import {
   FileText,
 } from "lucide-react";
 
-import { arrayMove } from "@dnd-kit/sortable";
-
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPaths";
 
