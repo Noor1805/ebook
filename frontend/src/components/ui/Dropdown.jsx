@@ -22,7 +22,7 @@ const Dropdown = ({ trigger, children, className = "" }) => {
   }, []);
 
   return (
-    <div ref={dropdownRef}>
+    <div className="relative inline-block text-l" ref={dropdownRef}>
         <div onClick={() => setIsOpen(!isOpen)}>{trigger} </div>
         {isOpen && (
             <div

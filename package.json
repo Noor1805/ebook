@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "react-simplemde-editor": "^5.2.0",
+    "simplemde": "^1.11.2"
+  }
+}
