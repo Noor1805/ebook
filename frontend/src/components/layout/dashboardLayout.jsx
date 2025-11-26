@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Album } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import ProfileDropdown from "../layout/ProfileDropDown.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
+import ProfileDropdown from "./ProfileDropDown.jsx";
 
 const DashboardLayout = ({ children }) => {
   const { user, logout } = useAuth();
