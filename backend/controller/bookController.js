@@ -207,7 +207,8 @@ const updateBookCover = async (req, res) => {
       );
     }
     
-    book.coverImage = `/${req.file.path}`;
+    book.coverImage = "/" + req.file.path.replace(/\\/g, "/");
+
     const updatedBook = await book.save();
 
     res.status(200).json({

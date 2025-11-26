@@ -47,7 +47,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
 
             <Button
               onClick={onConfirm}
-              className="bg-red-600 text-white hover:bg-red-700"
+              className="bg-red-600 rounded-lg p-2 text-white hover:bg-red-700"
             >
               Confirm
             </Button>

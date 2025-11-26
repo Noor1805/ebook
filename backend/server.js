@@ -35,6 +35,8 @@ app.use("/api/auth", authRoute); // login/signup
 app.use("/api/ai", aiRoute); // user related
 app.use("/api/books", bookRoute);
 app.use("/api/export", exportRoute); 
+app.use("/uploads", express.static("uploads"));
+
 
 // ✅ Start server
 const PORT = process.env.PORT || 5000;
