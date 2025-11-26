@@ -32,7 +32,7 @@ const InputField = ({
           onChange={onChange}
           {...props}
           className={`
-            w-full h-[44px] rounded-lg border border-purple-200 
+            w-full h-11 rounded-lg border border-purple-200 
             bg-white text-gray-800 text-sm
             placeholder-gray-400
             focus:ring-2 focus:ring-purple-500
