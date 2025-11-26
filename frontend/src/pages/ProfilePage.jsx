@@ -80,7 +80,7 @@ export default function ProfilePage() {
           <div className="flex items-center gap-5">
             <div
               className="
-                w-20 h-20 rounded-full bg-gradient-to-br 
+                w-20 h-20 rounded-full bg-linear-to-br 
                 from-purple-400 to-purple-600 
                 flex items-center justify-center text-white text-3xl font-bold shadow-md
               "
