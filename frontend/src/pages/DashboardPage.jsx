@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import DashboardLayout from "../components/layout/DashboardLayout";
+import DashboardLayout from "../components/layout/DashboardLayout.jsx";
+
 
 
 import axiosInstance from "../utils/axiosInstance";
