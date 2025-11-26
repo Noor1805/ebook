@@ -8,15 +8,17 @@ export const API_PATHS = {
     UPDATE_PROFILE: "/api/auth/profile",
   },
 
-  BOOKS: {
-    // Backend mounts book routes at /api/books (plural)
-    CREATE_BOOK: "/api/books",
-    GET_BOOKS: "/api/books",
-    GET_BOOK_BY_ID: "/api/books",      // use with /:id
-    UPDATE_BOOK: "/api/books",         // use with /:id
-    DELETE_BOOK: "/api/books",         // use with /:id
-    UPDATE_COVER: "/api/books/cover",  // use with /:id
-  },
+ BOOKS: {
+  CREATE_BOOK: "/api/books",
+  GET_BOOKS: "/api/books",
+  GET_BOOK_BY_ID: "/api/books",
+  UPDATE_BOOK: "/api/books",
+  DELETE_BOOK: "/api/books",
+
+  // ⭐ Correct and final
+  UPDATE_COVER: "/api/books/cover",
+},
+
 
   AI: {
     GENERATE_OUTLINE: "/api/ai/generate-outline",

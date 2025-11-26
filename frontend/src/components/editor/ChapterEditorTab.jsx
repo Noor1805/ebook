@@ -113,7 +113,6 @@ const ChapterEditorTab = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-
           {/* EDIT BTN */}
           <button
             onClick={() => setIsPreviewMode(false)}
@@ -174,8 +173,13 @@ const ChapterEditorTab = ({
       <div className="mb-6">
         <InputField
           label="Chapter Title"
+          name="title" 
           value={currentChapter.title}
-          onChange={onChapterChange}
+          onChange={(e) =>
+            onChapterChange({
+              target: { name: "title", value: e.target.value },
+            })
+          }
           className="border-purple-300 focus:border-purple-500"
           placeholder="Enter chapter title"
         />
@@ -185,11 +189,12 @@ const ChapterEditorTab = ({
       <div className="w-full mt-4">
         {isPreviewMode ? (
           <div className="bg-white p-6 rounded-xl border border-purple-200 shadow-sm transition-all">
-
             <div className="mb-4">
               <div className="flex items-center gap-2">
                 <Eye className="w-5 h-5 text-purple-600" />
-                <span className="text-purple-700 font-semibold">Preview Mode</span>
+                <span className="text-purple-700 font-semibold">
+                  Preview Mode
+                </span>
               </div>
             </div>
 
@@ -200,8 +205,7 @@ const ChapterEditorTab = ({
             <div
               className="prose prose-purple max-w-none text-gray-800"
               style={{
-                fontFamily:
-                  'Charter, Georgia, "Times New Roman", serif',
+                fontFamily: 'Charter, Georgia, "Times New Roman", serif',
                 lineHeight: 1.8,
                 fontSize: "1.05rem",
               }}
@@ -229,15 +233,13 @@ const ChapterEditorTab = ({
 
       {/* STATUS BAR */}
       <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-purple-50 rounded-lg border border-purple-100 shadow-sm">
-
         <div className="flex gap-6 text-sm text-gray-700 font-medium">
           <span className="flex items-center gap-1">
             Words:
             <span className="text-purple-700 font-semibold">
               {currentChapter.content
-                ? currentChapter.content
-                    .split(/\s+/)
-                    .filter((w) => w.length).length
+                ? currentChapter.content.split(/\s+/).filter((w) => w.length)
+                    .length
                 : 0}
             </span>
           </span>

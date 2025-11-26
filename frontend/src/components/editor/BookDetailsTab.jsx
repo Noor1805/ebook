@@ -1,87 +1,101 @@
-import React from "react";
+import InputField from "../ui/InputField";
+import Button from "../ui/Button";
+import { UploadCloud } from "lucide-react";
+import { BASE_URL } from "../../utils/apiPaths";
 
 const BookDetailsTab = ({
   book,
-  onBookChange = () => {},
-  onCoverUpload = () => {},
-  isUploading = false,
-  fileInputRef = null,
+  onBookChange,
+  onCoverUpload,
+  isUploading,
+  fileInputRef
 }) => {
-  if (!book) return null;
+
+  // FIXED: correct image URL builder
+  const coverImageUrl = book.coverImage?.startsWith("http")
+  ? book.coverImage
+  : `${BASE_URL}${book.coverImage}`.replace(/\\/g, "/");
+
+  
 
   return (
-    <div className="p-6">
-      <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg border border-purple-100 shadow-sm">
-        <h3 className="text-lg font-semibold text-purple-700 mb-4">
+    <div className="p-4 md:p-6 space-y-6">
+
+      {/* ============ BOOK DETAILS ============ */}
+      <div>
+        <h3 className="text-xl font-semibold text-purple-700 mb-4">
           Book Details
         </h3>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Title
-            </label>
-            <input
-              name="title"
-              value={book.title || ""}
-              onChange={onBookChange}
-              className="w-full border rounded-md p-2"
-            />
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InputField
+            label="Title"
+            name="title"
+            value={book.title}
+            onChange={onBookChange}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Author
-            </label>
-            <input
-              name="author"
-              value={book.author || ""}
-              onChange={onBookChange}
-              className="w-full border rounded-md p-2"
-            />
-          </div>
+          <InputField
+            label="Author"
+            name="author"
+            value={book.author}
+            onChange={onBookChange}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Description
-            </label>
-            <textarea
-              name="description"
-              value={book.description || ""}
-              onChange={onBookChange}
-              className="w-full border rounded-md p-2 min-h-[110px]"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Cover Image
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={onCoverUpload}
-                className="text-sm"
-              />
-              {isUploading ? (
-                <span className="text-sm text-purple-600">Uploading...</span>
-              ) : (
-                book.coverImagePreview && (
-                  <img
-                    src={book.coverImagePreview}
-                    alt="cover preview"
-                    className="w-20 h-14 object-cover rounded-md border"
-                  />
-                )
-              )}
-            </div>
-          </div>
+          <InputField
+            label="Subtitle"
+            name="subtitle"
+            value={book.subtitle || ""}
+            onChange={onBookChange}
+          />
         </div>
       </div>
+
+      {/* ============ COVER UPLOAD SECTION ============ */}
+      <div>
+        <h3 className="text-xl font-semibold text-purple-700 mb-4">
+          Cover Image
+        </h3>
+
+        <div className="flex flex-col md:flex-row gap-6 items-start">
+
+          {/* IMAGE PREVIEW */}
+          <img
+            src={coverImageUrl}
+            alt="Cover"
+            className="w-40 h-56 object-cover border rounded-lg shadow-sm"
+          />
+
+          {/* UPLOAD CONTROLS */}
+          <div className="space-y-3">
+            <p className="text-sm text-gray-600">
+              Upload a new cover image. Recommended size: <b>600×800px</b>.
+            </p>
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={onCoverUpload}
+              accept="image/*"
+              className="hidden"
+            />
+
+            <Button
+              variant="secondary"
+              onClick={() => fileInputRef.current?.click()}
+              isLoading={isUploading}
+              icon={UploadCloud}
+            >
+              Upload Image
+            </Button>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   );
 };
 
 export default BookDetailsTab;
+
