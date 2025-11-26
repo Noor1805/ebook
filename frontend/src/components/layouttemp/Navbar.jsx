@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { BookOpen, LogOut, Menu, X } from "lucide-react";
-import ProfileDropdown from "../layout/ProfileDropDown.jsx";
+import ProfileDropdown from "./ProfileDropDown";
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
