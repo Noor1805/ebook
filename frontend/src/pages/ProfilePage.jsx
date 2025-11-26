@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import InputField from "../components/ui/InputField";
 import Button from "../components/ui/Button";
+import DashboardLayout from "../components/layout/DashboardLayout.jsx";
 
-import DashboardLayout from "../components/layout/DashboardLayout";
 import { useAuth } from "../context/AuthContext";
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPaths";
