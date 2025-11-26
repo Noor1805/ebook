@@ -1,5 +1,4 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { model } = require("mongoose");
 const { getErrorMessage, errorResponse } = require("../utils/errorHandler");
 
 const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -34,30 +33,14 @@ Requirements:
 Output Format:
 Return ONLY a valid JSON array with no additional text, markdown, or formatting.
 Each object must have exactly two keys: "title" and "description".
-
-Example structure:
-[
-  {
-    "title": "Chapter 1: Introduction to the Topic",
-    "description": "A comprehensive overview introducing the main concepts. Sets the foundation for understanding the subject matter."
-  },
-  {
-    "title": "Chapter 2: Core Principles",
-    "description": "Explores the fundamental principles and theories. Provides detailed examples and real-world applications."
-  }
-]
-
-Generate the outline now.
 `;
 
-    // ✅ Request to Gemini
     const response = await ai
       .getGenerativeModel({ model: "gemini-2.5-flash-lite" })
       .generateContent(prompt);
 
     const text = await response.response.text();
 
-    // ✅ Extract JSON array
     const startIndex = text.indexOf("[");
     const endIndex = text.lastIndexOf("]") + 1;
 
@@ -69,19 +52,11 @@ Generate the outline now.
       );
     }
 
-    const jsonString = text.substring(startIndex, endIndex);
-    const outline = JSON.parse(jsonString);
+    const outline = JSON.parse(text.substring(startIndex, endIndex));
 
     res.status(200).json({ outline });
   } catch (error) {
     console.error("Error generating outline:", error);
-    if (error.message && error.message.includes("API_KEY")) {
-      return errorResponse(
-        res,
-        500,
-        "AI service configuration error. Please contact support."
-      );
-    }
     return errorResponse(
       res,
       500,
@@ -91,10 +66,9 @@ Generate the outline now.
   }
 };
 
-// ✅ Generate Chapter Content (empty handler for now)
 const generateChapterContent = async (req, res) => {
   try {
-    const { chapterTitle, chapterDiscription, style } = req.body;
+    const { chapterTitle, chapterDescription, style } = req.body;
 
     if (!chapterTitle || chapterTitle.trim().length === 0) {
       return errorResponse(
@@ -117,10 +91,7 @@ Requirements:
 3. Include relevant examples, explanations, or anecdotes as appropriate for the style
 4. Ensure the content flows logically from introduction to conclusion
 5. Make the content engaging and valuable to readers
-${chapterDescription
-    ? "6. Cover all points mentioned in the chapter description"
-    : ""
-}
+${chapterDescription ? "6. Cover all points mentioned in the chapter description" : ""}
 
 Format Guidelines:
 - Start with a compelling opening paragraph
@@ -132,20 +103,13 @@ Format Guidelines:
 Begin writing the chapter content now:
 `;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: prompt,
-    });
-    res.status(200).json({ content: response.text });
+    const model = ai.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+    const response = await model.generateContent(prompt);
+    const text = await response.response.text();
+
+    res.status(200).json({ content: text });
   } catch (error) {
     console.error("Error generating chapter:", error);
-    if (error.message && error.message.includes("API_KEY")) {
-      return errorResponse(
-        res,
-        500,
-        "AI service configuration error. Please contact support."
-      );
-    }
     return errorResponse(
       res,
       500,
