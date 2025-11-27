@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import InputField from "../components/ui/InputField";
 import Button from "../components/ui/Button";
-import DashboardLayout from "../components/LayoutTemp/dashboardLayout";
+import DashboardLayout from "../components/layouttemp/DashboardLayout";
 
 
 import { useAuth } from "../context/AuthContext";
