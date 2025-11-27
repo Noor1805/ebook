@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import DashboardLayout from "../components/LayoutTemp/dashboardLayout";
+import DashboardLayout from "../components/layouttemp/DashboardLayout";
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPaths";
 import { useAuth } from "../context/AuthContext";
