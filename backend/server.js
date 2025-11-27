@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const connectDB = require("./config/db");
+const job = require("./utils/cron");
 
 const authRoute = require("./routes/authRoute"); 
 const aiRoute = require("./routes/aiRoute");
@@ -42,5 +43,6 @@ app.use("/uploads", express.static("uploads"));
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  job.start();
 });
 
