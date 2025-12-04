@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
-import { API_PATHS } from "../utils/apiPaths";
+import { API_PATHS, BASE_URL } from "../utils/apiPaths";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -70,7 +70,7 @@ export default function ViewBookPage() {
         {book.coverImage && (
           <div className="flex justify-center mb-8">
             <img
-              src={`http://localhost:8000${book.coverImage}`}
+              src={`${BASE_URL}${book.coverImage}`}
               alt="Cover"
               className="w-60 h-80 object-cover rounded-lg shadow-md border border-purple-200"
             />
